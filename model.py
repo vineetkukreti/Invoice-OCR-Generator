@@ -9,9 +9,8 @@ Original file is located at
 
 
 
-
 import os
-os.environ['GOOGLE_API_KEY'] = "AIzaSyADvpyRnnyKupNoddbNv3D4QNqf2eaGRGo"
+os.environ['GOOGLE_API_KEY'] = "paste your API key"
 
 import google.generativeai as genai
 
