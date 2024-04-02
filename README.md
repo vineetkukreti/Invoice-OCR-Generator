@@ -43,4 +43,4 @@ This project utilizes Google's Generative AI model for content generation.
 [MIT License](LICENSE)
 
 ## Author
-[Your Name Here](https://github.com/your-github-username)
+[vineet kukreti](https://vineetkukreti.rocks/)
