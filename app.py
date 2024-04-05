@@ -1,14 +1,11 @@
-from flask import Flask, render_template, request
-from pathlib import Path
+from flask import Flask, render_template, request, url_for, send_from_directory
 import os
+from pathlib import Path
 import google.generativeai as genai
 
-app = Flask(__name__)
-
 # Set Google API key
-os.environ['GOOGLE_API_KEY'] = "paste you API key"
+os.environ['GOOGLE_API_KEY'] = "AIzaSyAroxf06TrvDGFDiWAdr5m8AUuqoqMe_TY"
 genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
-# you should use dotenv instead
 
 # Model Configuration
 MODEL_CONFIG = {
@@ -60,30 +57,44 @@ def gemini_output(image_path, system_prompt, user_prompt):
     image_info = image_format(image_path)
     input_prompt = [system_prompt, image_info[0], user_prompt]
     response = model.generate_content(input_prompt)
-    return response.text
+    return image_info[0]['data'], response.text
 
-@app.route('/', methods=['GET', 'POST'])
+app = Flask(__name__)
+
+@app.route('/')
 def index():
+    return render_template('index.html')
+
+@app.route('/result', methods=['POST'])
+def result():
     if request.method == 'POST':
+        system_prompt = """ 
+        
+you will work as  As the diligent shopkeeper, it's your responsibility to meticulously manage our inventory. To ensure utmost accuracy, I kindly request clear, well-lit images of the products you wish to count. Pay special attention to the labels, as they hold the key to identifying each item correctly.
+
+Rest assured, we'll employ cutting-edge deep learning algorithms to meticulously analyze these images like ocr , yolo ,image segmentation and object detection should be accuracte, it's very impoartant so, these are very imaportant rule to follow to make the model. This advanced technology enables me to discern between various products, regardless of their size or shape. Each item will be accurately counted, and you'll compile a comprehensive table detailing the count of similar products.
+
+In our pursuit of excellence, precision is paramount. With our sophisticated inventory management system, you can trust that every product will be accounted for with the utmost care and attention to detail.
+
+So, be ready, when we provide the images. Your satisfaction is our commitment, and accuracy is our hallmark 
+
+"""
+        user_prompt = "user will get the names of product with frequencey  and if not then add that in unknown  in html format  and make sure focues the labels of the prroduct and it's shape ,size ,apperance etc or categoring similar product "
+
         file = request.files['file']
         if file:
             # Save the uploaded image to a location
             file_path = 'uploads/' + file.filename
             file.save(file_path)
+
             # Generate HTML content
-            system_prompt = """
-              Welcome to the OCR Challenge! Your mission, should you choose to accept it, is to harness your inner OCR expertise and decipher the cryptic characters scattered across a mysterious image—otherwise known as a receipt. Armed with your keen eye and HTML prowess, your task is to meticulously transcribe every symbol, number, and word from the image onto the digital canvas.
+            image_data, page_content = gemini_output(file_path, system_prompt, user_prompt)
+            image_url = url_for('uploaded_file', filename=file.filename)
+            return render_template('result.html', image_url=image_url, page_content=page_content)
 
-                But wait, there's a twist! Not only must you accurately translate the text, but you must also ensure that every character is aligned precisely as it appears on the original receipt. Yes, that means each decimal point, every dollar sign, and all those sneaky spaces must follow the same formatting and arrangement as the enigmatic image.
-
-                Do you have what it takes to conquer the OCR Challenge and emerge victorious? Prepare your HTML tags, sharpen your focus, and dive into the tangled web of characters awaiting your expert scrutiny! """
-
-            user_prompt = "Your mission, should you choose to accept it, is to craft an HTML code capable of faithfully replicating the enigmatic text lurking within a mysterious image . As you embark on this journey, remember: precision is paramount. Your task is not merely to transcribe the characters, but to ensure that every dot, comma, and space aligns perfectly, mirroring the cryptic arrangement of the original image"
-
-            page = gemini_output(file_path, system_prompt, user_prompt)
-            print(page)
-            return page
-    return render_template('index.html')
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory('uploads', filename)
 
 if __name__ == '__main__':
     app.run(debug=True)

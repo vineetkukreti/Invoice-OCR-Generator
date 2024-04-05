@@ -10,7 +10,7 @@ Original file is located at
 
 
 import os
-os.environ['GOOGLE_API_KEY'] = "paste your API key"
+os.environ['GOOGLE_API_KEY'] = "AIzaSyADvpyRnnyKupNoddbNv3D4QNqf2eaGRGo"
 
 import google.generativeai as genai
 
@@ -58,7 +58,7 @@ def image_format(image_path):
 
     image_parts = [
         {
-            "mime_type": "image/png", ## Mime type are PNG - image/png. JPEG - image/jpeg. WEBP - image/webp
+            "mime_type": "image/jpeg", ## Mime type are PNG - image/png. JPEG - image/jpeg. WEBP - image/webp
             "data": img.read_bytes()
         }
     ]
@@ -71,18 +71,33 @@ def gemini_output(image_path, system_prompt, user_prompt):
     response = model.generate_content(input_prompt)
     return response.text
 
-system_prompt = """
-              Welcome to the OCR Challenge! Your mission, should you choose to accept it, is to harness your inner OCR expertise and decipher the cryptic characters scattered across a mysterious image—otherwise known as a receipt. Armed with your keen eye and HTML prowess, your task is to meticulously transcribe every symbol, number, and word from the image onto the digital canvas.
+system_prompt = """Welcome to the Retail Product Inventory Management System!
 
-But wait, there's a twist! Not only must you accurately translate the text, but you must also ensure that every character is aligned precisely as it appears on the original receipt. Yes, that means each decimal point, every dollar sign, and all those sneaky spaces must follow the same formatting and arrangement as the enigmatic image.
+As the shop manager, your role is pivotal in maintaining accurate records of our daily retail inventory. Our system utilizes cutting-edge image analysis technology to assist you in this task. We understand the importance of efficiency and accuracy in managing inventory, and our system is designed to streamline this process for you.
 
-Do you have what it takes to conquer the OCR Challenge and emerge victorious? Prepare your HTML tags, sharpen your focus, and dive into the tangled web of characters awaiting your expert scrutiny! """
+Here's a detailed overview of how our system works:
 
-image_path = "rec.PNG"
+Image Upload: Your first step is to provide an image containing the products you wish to inventory. This image should capture all the products visible in your shop at a particular moment in time.
 
-user_prompt = "Welcome to the HTML Alignment Quest! Your mission, should you choose to accept it, is to craft an HTML code capable of faithfully replicating the enigmatic text lurking within a mysterious image. As you embark on this journey, remember: precision is paramount. Your task is not merely to transcribe the characters, but to ensure that every dot, comma, and space aligns perfectly, mirroring the cryptic arrangement of the original image."
+Image Analysis: Once you've uploaded the image, our system kicks into action. Through advanced image recognition algorithms, we meticulously analyze the contents of the image. Every product visible in the image is identified and categorized.
 
-#Are you ready to wield your HTML skills like a master artisan, breathing life into the digital canvas with pixel-perfect precision? Prepare to embark on a journey where every tag and attribute serves as your brush, and every line of code paints a vivid portrait of the textual labyrinth awaiting your expertise. The challenge awaits—will you rise to meet it? "
+Product Enumeration: After identifying the products, our system counts the number of instances of each product present in the image. It carefully tallies the quantity of each product type, ensuring a comprehensive inventory assessment.
+
+Accuracy Consideration: While accuracy is essential, we understand that perfect precision may not always be feasible, especially when dealing with diverse and dynamic retail environments. Therefore, our focus is on providing a reliable estimation based on the visual information present in the image.
+
+Product List Generation: Once the analysis is complete, we generate a detailed list of all the products identified in the image. Alongside each product, you'll find the corresponding count, indicating how many instances of that product were detected.
+
+Record Maintenance: It's important to note that your oversight is crucial in this process. While our system handles the analysis and enumeration, you play a vital role in ensuring the accuracy and integrity of the inventory records. You'll need to review the generated product list and verify its accuracy against the actual inventory in your shop.
+
+Continuous Improvement: We're committed to enhancing the functionality and accuracy of our system continually. Your feedback and insights are invaluable in this journey of improvement. We encourage you to provide us with any feedback or suggestions you may have to further refine our inventory management system.
+
+
+Please upload an image of your current inventory to begin the analysis.
+ """
+
+image_path = "2.jpg"
+
+user_prompt = "user will get the names of product with frequencey in html format and "
 
 page = gemini_output(image_path, system_prompt, user_prompt)
 
